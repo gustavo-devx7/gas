@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const officialUrl = "/v2";
+const officialUrl = "https://gas-do-povo.vercel.app/";
 
 export default function Home() {
   return (
