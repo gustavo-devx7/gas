@@ -1,0 +1,20 @@
+"use client";
+
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+type FormValues = { name: string; email: string; cpf: string; phone: string; residents: string; age: string; state: string; city: string; cep: string };
+const initialValues: FormValues = { name: "", email: "", cpf: "", phone: "", residents: "", age: "", state: "", city: "", cep: "" };
+function formatCpf(value: string) { const d = value.replace(/\D/g, "").slice(0, 11); return d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2"); }
+function formatPhone(value: string) { const d = value.replace(/\D/g, "").slice(0, 11); if (d.length <= 2) return d ? `(${d}` : ""; if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`; return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`; }
+function formatCep(value: string) { const d = value.replace(/\D/g, "").slice(0, 8); return d.replace(/(\d{5})(\d{1,3})$/, "$1-$2"); }
+
+export default function V3Page() {
+  const [values, setValues] = useState<FormValues>(initialValues);
+  const isComplete = useMemo(() => Object.values(values).every((value) => value.trim() !== ""), [values]);
+  function update(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) { const { name, value } = event.target; const formatted = name === "cpf" ? formatCpf(value) : name === "phone" ? formatPhone(value) : name === "cep" ? formatCep(value) : value; setValues((current) => ({ ...current, [name]: formatted })); }
+  function handleSubmit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (isComplete) { sessionStorage.setItem("gas-lead", JSON.stringify(values)); window.location.assign("/v4"); } }
+  const states = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+  return <main className="form-page"><header className="tb-hd"><div className="tb-hd-in"><Link className="tb-hd-brand" href="/"><Image src="/images/logo-tb-square-512-150x150.webp" alt="Tudo benefícios" width={36} height={36} /><span>tudo benefícios</span></Link></div></header><section className="form-shell"><div className="form-heading"><Image src="/images/logo-gdp-trim.webp" alt="Gás do Povo" width={190} height={126} /><p className="form-kicker">CONSULTA DO BENEFÍCIO</p><h1>Consulte o Gás do Povo</h1><p>Preencha seus dados para continuar a consulta do benefício.</p></div><form className="benefit-form" onSubmit={handleSubmit}><label>Nome completo<input name="name" value={values.name} onChange={update} required /></label><label>E-mail<input name="email" value={values.email} onChange={update} type="email" placeholder="seu@email.com" required /></label><label>CPF<input name="cpf" value={values.cpf} onChange={update} inputMode="numeric" maxLength={14} required /></label><label>Número de celular<input name="phone" value={values.phone} onChange={update} inputMode="tel" maxLength={15} required /></label><div className="form-row"><label>Pessoas na residência<input name="residents" value={values.residents} onChange={update} type="number" min="1" required /></label><label>Idade<input name="age" value={values.age} onChange={update} type="number" min="1" max="120" required /></label></div><div className="form-row"><label>Estado<select name="state" value={values.state} onChange={update} required><option value="" disabled>Selecione</option>{states.map((state) => <option key={state}>{state}</option>)}</select></label><label>Cidade<input name="city" value={values.city} onChange={update} required /></label></div><label>CEP<input name="cep" value={values.cep} onChange={update} inputMode="numeric" maxLength={9} required /></label><button type="submit" className="form-button" style={{ backgroundColor: isComplete ? "#1351b4" : "#c7cbd1", cursor: isComplete ? "pointer" : "not-allowed" }} disabled={!isComplete}>CONTINUAR CONSULTA</button></form><p className="form-disclaimer">Seus dados são usados somente para processar a consulta.</p></section></main>;
+}
