@@ -353,6 +353,14 @@ button {
   box-shadow: 0 10px 28px #193b7510;
 }
 
+.vsl-loading-message {
+  margin: 10px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .vsl-placeholder {
   min-height: 250px;
   display: grid;
